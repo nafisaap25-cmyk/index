@@ -1,0 +1,576 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <title>Happy Birthday!</title>
+  <style>
+    body {
+      margin: 0;
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      flex-direction: column;
+      background: linear-gradient(180deg, #0A0A0A, #654321);
+      font-family: 'Comic Sans MS', cursive, sans-serif;
+      color: #fff;
+      text-align: center;
+    }
+    h1 { font-size: 3rem; margin-bottom: 10px; text-shadow: 2px 2px #AA6C39; }
+    p { font-size: 1.5rem; }
+
+    /* 🎈 Balloons */
+    .balloon {
+      position: absolute;
+      bottom: -150px;
+      width: 80px;
+      height: 100px;
+      border-radius: 50% 50% 45% 55% / 60% 60% 40% 40%;
+      animation: float 6s linear forwards;
+    }
+    .string {
+      position: absolute;
+      width: 2px;
+      height: 60px;
+      background: #555;
+      top: 100px;
+      left: 50%;
+      transform: translateX(-50%);
+    }
+    @keyframes float {
+      0% { transform: translateY(0) rotate(0deg); opacity: 1; }
+      100% { transform: translateY(-120vh) rotate(10deg); opacity: 0; }
+    }
+    canvas {
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      pointer-events: none;
+    }
+
+    /* 🎁 Gift Box */
+    .gift-container {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: pointer;
+    }
+    .gift {
+      font-size: 5rem;
+      transition: transform 0.2s;
+    }
+    .gift:hover { transform: scale(1.2); }
+    .click-text {
+      margin-top: 10px;
+      font-size: 1.2rem;
+      color: #fff;
+      text-shadow: 1px 1px #AA6C39;
+      animation: blink 1s infinite;
+    }
+    @keyframes blink {
+      0%, 100% { opacity: 1; }
+      50% { opacity: 0.5; }
+    }
+
+    /* 🎉 Popup Modal */
+    .modal {
+      display: none;
+      position: fixed;
+      top: 0; left: 0;
+      width: 100%; height: 100%;
+      background: rgba(0,0,0,0.6);
+      justify-content: center;
+      align-items: center;
+    }
+    .modal-content {
+      background: #fff;
+      color: #333;
+      padding: 30px;
+      border-radius: 15px;
+      text-align: center;
+      width: 450px;
+      position: relative;
+      animation: pop 0.3s ease;
+    }
+    .modal-content h2 {
+      margin-top: 0;
+      color: #0A0A0A;
+    }
+    .modal-buttons button {
+      margin: 10px;
+      padding: 10px 15px;
+      border: none;
+      border-radius: 10px;
+      background: #654321;
+      color: #fff;
+      cursor: pointer;
+    }
+    .modal-buttons button:hover { background: #0A0A0A; }
+    .section {
+      display: none;
+      margin-top: 15px;
+      text-align: center;
+    }
+    .close-btn {
+      margin-top: 20px;
+      padding: 10px 20px;
+      border: none;
+      background: #A8A9AD;
+      color: #fff;
+      border-radius: 10px;
+      cursor: pointer;
+      font-size: 1rem;
+    }
+	.close-btn:hover {
+	  background: #0A0A0A;
+	}
+    @keyframes pop {
+      from { transform: scale(0.5); opacity: 0; }
+      to { transform: scale(1); opacity: 1; }
+    }
+	.letter-text p {
+	  text-align: justify;
+	  margin-bottom: 15px;
+	  line-height: 1;
+	  font-size: 1rem
+	}
+
+
+    /* 🎵 Music Player */
+    .music-player {
+      position: fixed;
+      bottom: 20px;
+      left: 15%;
+      transform: translateX(-50%);
+      display: flex;
+      align-items: center;
+      gap: 10px;
+      background: rgba(255, 255, 255, 0.25);
+      padding: 10px 20px;
+      border-radius: 20px;
+      font-size: 16px;
+      color: white;
+      backdrop-filter: blur(8px);
+      box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+      z-index: 9999;
+    }
+    .music-player button {
+      background:#654321;
+      border: none;
+      color: white;
+      font-size: 14px;
+      padding: 6px 12px;
+      border-radius: 8px;
+      cursor: pointer;
+      transition: background 0.2s ease, transform 0.1s ease;
+    }
+    .music-player button:hover {
+      background: #000000;
+      transform: scale(1.05);
+    }
+
+    canvas, .confetti, .balloons {
+      pointer-events: none;
+    }
+
+    /* 📸 Gallery for Moments & Gifts */
+    .gallery {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+    }
+    .gallery img {
+      max-width: 250px;
+      max-height: 250px;
+      border-radius: 10px;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.3);
+    }
+    .gallery button {
+      background: rgba(0,0,0,0.5);
+      border: none;
+      color: white;
+      font-size: 24px;
+      padding: 5px 10px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    .gallery button:hover {
+      background: rgba(0,0,0,0.8);
+    }
+	
+	/* Letter navigation */
+	.page {
+	  display: none;
+	}
+	.page.active {
+	  display: block;
+	}
+	.nav-buttons {
+	  margin-top: 15px;
+	  text-align: center;
+	}
+	.nav-buttons button {
+	  margin: 0 5px;
+	  padding: 8px 15px;
+	  border: none;
+	  border-radius: 8px;
+	  background: #654321;
+	  color: #fff;
+	  cursor: pointer;
+	  transition: background 0.2s ease, transform 0.1s ease;
+	}
+	.nav-buttons button:hover {
+	  background: #0A0A0A;
+	  transform: scale(1.05);
+	}
+
+  </style>
+</head>
+<body>
+  <h1>🎂 Happy Birthday, Hindri! 🎂</h1>
+  <p>This one's special for you, I hope you love it💖</p>
+  <canvas id="confetti"></canvas>
+
+  <!-- 🎁 Gift Box Center -->
+  <div class="gift-container" id="giftContainer">
+    <div class="gift" id="gift">🎁</div>
+    <div class="click-text">Click Me</div>
+  </div>
+
+  <!-- 🎉 Popup -->
+  <div class="modal" id="modal">
+    <div class="modal-content">
+      <h2>Which One Will You Open First?🎉</h2>
+      <div class="modal-buttons">
+        <button data-section="letter">💌 Essay(?)</button>
+        <button data-section="moments">📸 Moments</button>
+        <button data-section="gifts">🎁 Gifts</button>
+      </div>
+      
+	<!-- 💌 Letter -->
+	<div id="letter" class="section letter-text">
+	  <div class="page active">
+		<p>Miliar-miliar, juta-juta, ratus-ratus sekian kemungkinan orang di dunia, kamu dapatnya aku. Hahahaha</p>
+		<p>Hi Riri, happy birthday ya! 😊 I know you hate the idea of a birthday, because birthday means getting older (you said) lol.
+		But, let me cherish and celebrate this special day of yours!</p>
+		<p>Maybe I'll start by telling you the story behind this web web html css idea ya wkwk. Jadi, kemarin (28/08/2025) sore, aku lagi
+		ngulik2 playlist spotify ceunah wkwk. Terus eeeh Sal punya lagu judulnya "Serta Mulia"? lagu kaya gimana ini?</p>
+		<p>Pas aku dengerin kok lagunya lucu dan sweet dan pas banget sama momen ulangtahun kamu🥹. Terus in an instant aku langsung kepikiran
+		buat bikin web ala-ala ini with Serta Mulia as the background song💖</p>
+		<p>Kalo kamu bertanya-tanya: Apakah ini alasan aku kemaren pulang sore? Apa ini yang aku kerjain kemaren malem? Apa web ini yang
+		kamu liat sekilas pas vcall kemarin malem dan aku panik? Jawabannya iya semua😠</p>
+	  </div>
+	  <div class="page">
+		<p>Oh! I haven't answered the questions you sent me on Instagram ya?</p>
+		<p>Let's go. I'll answer them~</p>
+	  </div>
+	  <div class="page">
+		<p><b>1. What side of you scares me the most?</b></p>
+		<p>Most? Then it will be your brain and your skill to twist words hahahah. To be honest, the night when we had an argument ngebekas banget di aku. Kaya, aaaa kalo berantem
+		sama Riri aku kayaknya ga sanggup deh ngimbangin argumen dia wkwkwk (apa yang gue omongin salah semua anjeerrr😭)</p>
+		<p>Sekalian deh, 2 lagi ya😝</p>
+		<p>Your picky nature. Inget ga sih dulu aku pernah insecure karena tipe kamu yang bule (omg aku jawa tulen, walaupun Papi kaya cina😭). Aku juga
+		pernah mental breakdance karena aku ngerasa aku ga di level kamu dari segi work life dan lifestyle? Jadi, iya betul kamu adalah orang yang sangat picky,
+		jadi aku takut banget kamu ilfeel sama aku huhuhu😭. Eventho you're gonna say "Kan ga segampang itu ilfeel dan ninggalin", ya tapi kan tetep aja ilfeel😭</p>
+		<p>Your ambitious self. I always admire you for your eagerness to become better and better in everything, especially professional and academic aspects. You also
+		told me the story of you and your previous potential lover (yang nginep ituu wkwk). What I'm tryna say is: I also want to excel in life, in my work, kalo bisa
+		sekolah lagi aku juga mauu. Cuman, aku gatau sih bayangan kamu tentang aku tuh saat ini gimana, apakah kamu punya harapan tinggi ke aku? Takut aja kalo yang ada
+		di pikiran kamu dan kenyataannya itu beda :(</p>
+	  </div>
+	  <div class="page">
+		<p><b>2. What's something about you that still surprises me?</b></p>
+		<p>That you can handle work pressures and still managed to regulate your emotions well. Dari sini, aku bisa tau kalo kamu adalah orang yang bisa membuat
+		prioritas, bisa membuat keputusan, bisa kelola emosi kamu dengan baik, dan bisa executes well kerjaan-kerjaan kamu. Setiap kamu cerita kamu dapet task baru,
+		aku tuh selalu kaya "Hah dia dapet lagi, dapet lagi, dan saat mengerjakan itu ga sekalipun ngeluh?".
+		<p>You're a tough girl. Meskipun kamu ga familiar sama task-nya, kamu mau coba buat belajar lagi, buat ngulik lagi, cari cara penyelesaian yang lebih cepet, malem-malem pun kadang kerja.
+		You're someone with a can-do attitude ceunah wkwk. No wonder the MYDP took you in dan langsung di HO lagi!! hahahah (you've no idea how proud I am
+		everytime I told people about you.)</p>
+	  </div>
+	  <div class="page">
+		<p>I told Papi "Papi, aku punya temen yang kerja di Merdeka. Cewek juga loh Piii". He replied "Merdeka Copper?". And I responded "Iyaaa!! Keren banget
+		kan Pi!"</p>
+		<p>I told Melin "Dia di HO", and she replied "Hah kok bisaaa?!?! Keren bangeetttt"</p>
+		<p>I told Zifa "Jip, aku punya temen yang kerja di Merdeka. Dia sekarang di HO, tapi dia nanti mau ke site. Kamu daftar ajaa, nanti kamu bisa main
+		sama temen akuu!!" and also "Kemaren aku ke Dufan sama temenku yang di Merdeka itu lohh!!"</p>
+		<p>I told Mas Angger "Aku hari ini mau ketemu temenku, dia kerja di SCBD". He replied "Wkwkwk kereeen anak SCBD broooook. Gelem aku yoan ngantor disana biar
+		skenaa"</p>
+		<p>Dan itu semua bukan cuma karena kamu kerja di Company A, kamu kerjanya ABCD. It's more like I want to brag about you and show you off to everyone in the most subtle
+		way possible~😊🫶</p>
+		<p>🎶Now Playing: Agora Hills by Doja Cat🎶</p>
+		<p>One more thing, despite your calm, cool, collected demeanor, you can be a baby too! hahahaha. It's amusing tho to see that side of you,
+		makes me wanna pinch your cheeks, hug you all day, and tell you that you're my baby and you are safe with me. Keep on being my baby ya?</p>
+	  </div>
+	  <div class="page">
+		<p><b>3. What do I find most attractive about you that is not physical?</b></p>
+		<p>Most attractive? Berati satu aja dong ya? wkwk</p>
+		<p>Boleh ga copas dari jawaban sebelumnya aja?😂😭</p>
+		<p>Wkwkwk yaudah nih ya aku jawab banyaakk....</p>
+		<p>Pertama-tama banget dulu, your mischievousness!! So very super attractive and fun and exciting to talk to you. Ada aja yang diperdebatin, diberantemin,
+		dibercandain, diobrolin, dan paling gong di-vs-in sih (adu sticker misalnya wkwk).</p>
+		<p>Kedua, your sweet side. Walaupun kamu tuh klaimnya "calm-cool-collected" + iseng, but you have that sweet and soft side that not everyone gets to see.
+		You make time for me, you make sure that I got home safe, you make sure that I have enough rest (by not calling me pagi-pagi banget pas di site dan pas abis
+		dari Dufan), you make sure that I eat my dinner, you make sure that I eat enough veggies and fruits wkwkwk. I also love it whenever your voice soften: like
+		when you asked me "Kamu ngantuk? Mau tidur?" or whenever you call my name. Aaahhh how is it possible not to fall for you, Riri?</p>
+		<p>Tapi jujur deh!! Kemaren malem pas kamu manggil-manggil aku "Caaa", itu ada lanjutannya kan sebenernya?!😡</p>
+	  </div>
+	  <div class="page">
+		<p>Ketiga, your initiatives. Aku suka deh kamu suka ambil inisiatif. I've told you, waktu di Indomaret/Alfa deket Cold Moo, we were queueing, terus kamu
+		liat aku kesusahan dan tiba-tiba ambil barang bawaan aku🥹.</p>
+		<p>Pas kita ada rencana ke Jogja kamu juga langsung cari-cari opsi transportasi dan booking bus!</p>
+		<p>Waktu kita lagi jalan di Pakansari juga, awalnya aku di sisi luar, terus kamu geser aku jadinya aku yang di sisi dalem🥹.</p>
+		<p>And I really appreciate that you want this something-ship to be balanced and ensure we both put in equal effort. I know this dari kamu yang selalu cover bills
+		makan saat aku cover transport. TAPI SEBENERNYA AKU GAMAU KAMU JAJANIN TERUUUSSSS😡. Besok gantian ya aku yang beliin jajan, kamu yang transport deh🙄</p>
+		<p>Kesimpulannya: kamu adalah orang yang sangat reliable, sukak banget banget banget😍🥹</p>
+	  </div>
+	  <div class="page">
+		<p><b>4. What's a small thing you do every day that I'd really miss if you stopped?</b></p>
+		<p>Sparing your time for me. It's not just as simple as I'll get sad if you stop talking to me, or
+		if you stop giving me morning calls, or if you stop calling me pet-names, or if you stop giving me hugs and kisses.</p>
+		<p>Sparing your time for me is a whole lot more complex action, it shows that you want to be around me, want to spend as much time as you can with me,
+		and that you care about me. So yes, I'd really miss if you stop sparing your time for me.</p>
+		<p>p.s: after all, I'm still a Quality-Time Person you know 😂</p>
+	  </div>
+	  <div class="page">
+		<p><b>5. What's the hardest thing for me to talk about, even with you?</b></p>
+		<p>Even with you, it's hard for me to talk about my insecurities or something I'm not good enough atm. Mungkin aku sebelumnya udah pernah bilang ya tentang ini?
+		But I don't like to be seen as someone who lacks something, I want to present myself as perfectly as possible, because I don’t want to be judged—and plus,
+		you are someone with a reaallyyyy high quality, I need to impress you, you know ;)</p>
+		<p>But at the same time—because it's with you—I want to and have to be raw with you. And Riri, the night when we talked about our secret will always have a place
+		in my heart.</p>
+		<p>The way we were laying skin to skin—I remember my hand were placed in my head thinking "Is it the right decision to tell her this? but I think I
+		have to"—and after I told you my secret, you softly said "Same here". Then, I asked you with a shocked but relieved breath "Really??" and we exchanged our views on the matter.
+		You remember?
+		<p>What a deep deep emotional connection we built right there.</p>
+		</p>
+	  </div>
+	   <div class="page">
+		<p>Udah terjawab semua ya? OK, saatnya sesi berdoa wkwkwk</p>
+		<p>Riri, di umur baru ini semoga semua mimpi indah kamu bisa tercapai ya. Bisa jadi Ibu Manager tambang, bisa bikin bangga mama dan kakak (which I bet
+		they are already), bisa lanjut studi ke luar negeri, sekalian bisa kerja di luar negeri deh, sehat selalu (soalnya kamu gasuka obat kan wkwk), dan semoga
+		kamu selalu bisa menemukan kebahagiaan (even in the small things!😊).</p>
+		<p>Walaupun ini ulangtahun kamu, boleh enggak aku juga make a wish? Boleh ya?</p>
+		<p>Harapan aku simple kok, I wish to walk beside you as you journey toward every dream you hold.</p>
+		<p>Oiya Riri, thank you for coming into my life ya. Since you, my days feel brighter, every step feels lighter, and you give me something to look forward
+		to in every tomorrow.</p>
+		<p>I feel like you are bringing the best out of me, and I feel truly happy whenever I'm with you.</p>
+		<p>I really hope it's us in the end, Riri ❤️</p>
+	  </div>
+	  <div class="page">
+		<p>Udah segitu dulu ya 🫶</p>
+	  </div>
+	  <div class="page">
+		<p>Sekali lagi "Serta mulia, panjang umurnya". Semoga di tahun-tahun berikutnya, aku bisa rayain bareng kamu lagi ya🫶✨</p>
+	  </div>
+
+	  <!-- Navigation -->
+	  <div class="nav-buttons">
+		<button id="prevLetter">⬅ Previous</button>
+		<button id="nextLetter">Next ➡</button>
+	  </div>
+	</div>
+
+
+      <!-- 📸 Moments Gallery -->
+      <div id="moments" class="section">
+		<h3>✨ Our Moments ✨</h3>
+        <div class="gallery">
+          <button class="prev">⟨</button>
+          <img id="momentsImage" src="" alt="Moment">
+          <button class="next">⟩</button>
+        </div>
+      </div>
+
+      <!-- 🎁 Gifts Gallery -->
+      <div id="gifts" class="section">
+		<h3>🧸Your Gifts:</h3>
+        <div class="gallery">
+          <button class="prev">⟨</button>
+          <img id="giftsImage" src="" alt="Gift">
+          <button class="next">⟩</button>
+        </div>
+      </div>
+
+      <button class="close-btn" id="closeBtn">Close</button>
+    </div>
+  </div>
+
+  <!-- 🎵 Music -->
+  <div class="music-player">
+    <span class="now-playing">🎶 Now Playing: Sal Priadi - Serta Mulia</span>
+    <button id="music-toggle">⏸ Pause</button>
+    <audio id="bg-music" autoplay loop muted>
+      <source src="https://github.com/nafisaap25-cmyk/backsound/raw/main/sertamulia.mp3" type="audio/mpeg">
+      Your browser does not support the audio element.
+    </audio>
+  </div>
+
+  <script>
+    // 🎈 Balloons
+    function createBalloon(color, left) {
+      const b = document.createElement("div");
+      b.className = "balloon";
+      b.style.background = color;
+      b.style.left = left + "px";
+      b.style.animationDuration = (5 + Math.random()*3) + "s";
+      const s = document.createElement("div");
+      s.className = "string";
+      b.appendChild(s);
+      document.body.appendChild(b);
+      setTimeout(() => b.remove(), 8000);
+    }
+    setInterval(() => {
+      createBalloon(
+        `hsl(${Math.random()*360}, 70%, 60%)`,
+        Math.random()*window.innerWidth
+      );
+    }, 800);
+
+    // 🎊 Confetti
+    const canvas = document.getElementById("confetti");
+    const ctx = canvas.getContext("2d");
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let confetti = [];
+    for (let i = 0; i < 100; i++) {
+      confetti.push({
+        x: Math.random() * canvas.width,
+        y: Math.random() * canvas.height,
+        r: Math.random() * 6 + 2,
+        d: Math.random() * 10 + 5,
+        color: `hsl(${Math.random()*360}, 80%, 60%)`
+      });
+    }
+    function drawConfetti() {
+      ctx.clearRect(0,0,canvas.width,canvas.height);
+      confetti.forEach(c => {
+        ctx.fillStyle = c.color;
+        ctx.fillRect(c.x, c.y, c.r, c.r);
+        c.y += 1 + Math.random()*2;
+        c.x += Math.sin(c.y/40);
+        if (c.y > canvas.height) c.y = -10;
+      });
+    }
+    setInterval(drawConfetti, 30);
+
+    // 🎁 Gift & Popup
+    const giftContainer = document.getElementById("giftContainer");
+    const modal = document.getElementById("modal");
+    const closeBtn = document.getElementById("closeBtn");
+    const sectionButtons = document.querySelectorAll(".modal-buttons button");
+    const sections = document.querySelectorAll(".section");
+
+    giftContainer.addEventListener("click", () => {
+      modal.style.display = "flex";
+    });
+
+    closeBtn.addEventListener("click", () => {
+      modal.style.display = "none";
+      sections.forEach(s => s.style.display = "none");
+    });
+
+    sectionButtons.forEach(btn => {
+      btn.addEventListener("click", () => {
+        const target = btn.dataset.section;
+        sections.forEach(s => s.style.display = "none");
+        document.getElementById(target).style.display = "block";
+      });
+    });
+
+    // 📸 Moments Gallery
+    const momentsImages = [
+	  "https://github.com/nafisaap25-cmyk/backsound/raw/main/Dufan_1.jpeg",
+	  "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto3.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto4.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto5.jpeg",
+	  "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto1.jpeg",
+	  "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto2.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto6.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto7.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto8.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto9.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto12.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto13.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/Foto15.jpeg"
+    ];
+    let momentsIndex = 0;
+    const momentsImg = document.getElementById("momentsImage");
+    momentsImg.src = momentsImages[momentsIndex];
+    document.querySelector("#moments .prev").addEventListener("click", () => {
+      momentsIndex = (momentsIndex - 1 + momentsImages.length) % momentsImages.length;
+      momentsImg.src = momentsImages[momentsIndex];
+    });
+    document.querySelector("#moments .next").addEventListener("click", () => {
+      momentsIndex = (momentsIndex + 1) % momentsImages.length;
+      momentsImg.src = momentsImages[momentsIndex];
+    });
+
+    // 🎁 Gifts Gallery
+    const giftsImages = [
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/icha.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/sydney.jpeg",
+      "https://github.com/nafisaap25-cmyk/backsound/raw/main/jose.jpeg",
+	  "https://github.com/nafisaap25-cmyk/backsound/raw/main/gift.jpeg"
+    ];
+    let giftsIndex = 0;
+    const giftsImg = document.getElementById("giftsImage");
+    giftsImg.src = giftsImages[giftsIndex];
+    document.querySelector("#gifts .prev").addEventListener("click", () => {
+      giftsIndex = (giftsIndex - 1 + giftsImages.length) % giftsImages.length;
+      giftsImg.src = giftsImages[giftsIndex];
+    });
+    document.querySelector("#gifts .next").addEventListener("click", () => {
+      giftsIndex = (giftsIndex + 1) % giftsImages.length;
+      giftsImg.src = giftsImages[giftsIndex];
+    });
+
+    // 🎵 Background Music Autoplay + Controls
+    const music = document.getElementById("bg-music");
+    const toggleBtn = document.getElementById("music-toggle");
+    music.play().catch(err => console.log("Autoplay blocked:", err));
+    giftContainer.addEventListener("click", () => {
+      music.muted = false;
+      music.volume = 1;
+      music.play();
+    });
+    toggleBtn.addEventListener("click", () => {
+      if (music.paused) {
+        music.play();
+        toggleBtn.textContent = "⏸ Pause";
+      } else {
+        music.pause();
+        toggleBtn.textContent = "▶ Play";
+      }
+    });
+	
+	// 💌 Letter navigation
+	const letterPages = document.querySelectorAll("#letter .page");
+	const prevLetterBtn = document.getElementById("prevLetter");
+	const nextLetterBtn = document.getElementById("nextLetter");
+	let currentPage = 0;
+
+	function showLetterPage(index) {
+	  letterPages.forEach((p, i) => {
+		p.classList.toggle("active", i === index);
+	  });
+	}
+
+	// Next button
+	nextLetterBtn.addEventListener("click", () => {
+	  currentPage = (currentPage + 1) % letterPages.length;
+	  showLetterPage(currentPage);
+	});
+
+	// Previous button
+	prevLetterBtn.addEventListener("click", () => {
+	  currentPage = (currentPage - 1 + letterPages.length) % letterPages.length;
+	  showLetterPage(currentPage);
+	});
+
+	// Initialize
+	showLetterPage(currentPage);
+
+  </script>
+</body>
+</html>
